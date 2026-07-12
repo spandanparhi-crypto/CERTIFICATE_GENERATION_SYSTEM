@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CertifyPro – Certificate Generation System</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --navy: #0f172a;
+    --navy2: #1e293b;
+    --navy3: #334155;
+    --gold: #f59e0b;
+    --gold2: #fbbf24;
+    --gold-light: #fef3c7;
+    --teal: #0ea5e9;
+    --teal-dark: #0284c7;
+    --green: #10b981;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --white: #ffffff;
+    --gray100: #f1f5f9;
+    --gray200: #e2e8f0;
+    --gray400: #94a3b8;
+    --gray600: #64748b;
+    --text: #0f172a;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(15,23,42,0.12);
+    --shadow-lg: 0 8px 40px rgba(15,23,42,0.18);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--gray100);color:var(--text);min-height:100vh;}
+
+  /* ── PAGE SYSTEM ── */
+  .page{display:none;min-height:100vh;}
+  .page.active{display:block;}
+
+  /* ── LANDING ── */
+  #page-landing{background:var(--navy);color:var(--white);}
+  .land-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .land-logo{font-size:1.5rem;font-weight:800;color:var(--gold);letter-spacing:-0.5px;}
+  .land-logo span{color:var(--white);}
+  .land-nav-links{display:flex;gap:32px;list-style:none;}
+  .land-nav-links a{color:var(--gray400);text-decoration:none;font-size:.95rem;transition:color .2s;}
+  .land-nav-links a:hover{color:var(--white);}
+  .land-nav-btns{display:flex;gap:12px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:8px;font-size:.9rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none;}
+  .btn-outline{background:transparent;border:1.5px solid var(--gray400);color:var(--white);}
+  .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-gold{background:var(--gold);color:var(--navy);font-weight:700;}
+  .btn-gold:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,.3);}
+  .btn-teal{background:var(--teal);color:var(--white);}
+  .btn-teal:hover{background:var(--teal-dark);}
+  .btn-danger{background:var(--red);color:var(--white);}
+  .btn-danger:hover{opacity:.9;}
+  .btn-green{background:var(--green);color:var(--white);}
+  .btn-green:hover{opacity:.9;}
+  .btn-purple{background:var(--purple);color:var(--white);}
+  .btn-sm{padding:7px 14px;font-size:.8rem;}
+  .btn-lg{padding:14px 32px;font-size:1rem;}
+
+  .hero{text-align:center;padding:100px 48px 80px;}
+  .hero-eyebrow{display:inline-block;background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3);border-radius:100px;padding:5px 18px;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:900;line-height:1.1;max-width:800px;margin:0 auto 24px;}
+  .hero h1 em{font-style:normal;color:var(--gold);}
+  .hero p{font-size:1.1rem;color:var(--gray400);max-width:520px;margin:0 auto 40px;line-height:1.7;}
+  .hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+
+  .stats-strip{display:flex;justify-content:center;gap:48px;padding:40px 48px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap;}
+  .stat-item{text-align:center;}
+  .stat-item strong{display:block;font-size:2rem;font-weight:900;color:var(--gold);}
+  .stat-item span{font-size:.85rem;color:var(--gray400);}
+
+  .features-section{padding:80px 48px;background:var(--navy2);}
+  .section-title{text-align:center;margin-bottom:48px;}
+  .section-title h2{font-size:2rem;font-weight:800;color:var(--white);}
+  .section-title p{color:var(--gray400);margin-top:8px;}
+  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;max-width:1100px;margin:0 auto;}
+  .feature-card{background:var(--navy3);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:28px;transition:transform .2s,border-color .2s;}
+  .feature-card:hover{transform:translateY(-4px);border-color:rgba(245,158,11,.3);}
+  .feature-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:16px;}
+  .feature-card h3{font-size:1rem;font-weight:700;color:var(--white);margin-bottom:8px;}
+  .feature-card p{font-size:.85rem;color:var(--gray400);line-height:1.6;}
+
+  /* ── AUTH PAGES ── */
+  #page-login,#page-register{background:linear-gradient(135deg,var(--navy) 0%,#1a2744 100%);display:flex;align-items:center;justify-content:center;min-height:100vh;}
+  .auth-box{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);}
+  .auth-logo{text-align:center;margin-bottom:28px;}
+  .auth-logo .logo-mark{font-size:2rem;font-weight:900;color:var(--navy);}
+  .auth-logo .logo-mark em{color:var(--gold);font-style:normal;}
+  .auth-logo p{font-size:.85rem;color:var(--gray600);margin-top:4px;}
+  .auth-box h2{font-size:1.4rem;font-weight:800;margin-bottom:6px;color:var(--navy);}
+  .auth-box .sub{font-size:.875rem;color:var(--gray600);margin-bottom:24px;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy3);margin-bottom:6px;}
+  .form-control{width:100%;padding:11px 14px;border:1.5px solid var(--gray200);border-radius:8px;font-size:.9rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;background:var(--white);}
+  .form-control:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,165,233,.12);}
+  .form-control.input-icon{padding-left:40px;}
+  .input-wrap{position:relative;}
+  .input-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--gray400);font-size:.85rem;}
+  .auth-footer{text-align:center;margin-top:20px;font-size:.85rem;color:var(--gray600);}
+  .auth-footer a{color:var(--teal);text-decoration:none;font-weight:600;}
+  .alert{padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:14px;}
+  .alert-error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;}
+  .alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;}
+  .w-full{width:100%;}
+  .mt-12{margin-top:12px;}
+
+  /* ── APP SHELL ── */
+  #page-app{display:none;flex-direction:column;}
+  #page-app.active{display:flex;}
+  .app-shell{display:flex;min-height:100vh;}
+
+  /* ── SIDEBAR ── */
+  .sidebar{width:240px;min-height:100vh;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:width .25s;}
+  .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.07);}
+  .sidebar-logo .logo-text{font-size:1.2rem;font-weight:900;color:var(--gold);}
+  .sidebar-logo .logo-text span{color:var(--white);}
+  .sidebar-logo .role-badge{display:inline-block;background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.25);border-radius:100px;padding:2px 10px;font-size:.7rem;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
+  .sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
+  .nav-section-label{padding:8px 20px 4px;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray400);}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;color:var(--gray400);cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:.875rem;font-weight:500;}
+  .nav-item:hover{background:rgba(255,255,255,.05);color:var(--white);}
+  .nav-item.active{background:rgba(245,158,11,.1);color:var(--gold);border-left-color:var(--gold);}
+  .nav-item i{width:18px;text-align:center;font-size:.9rem;}
+  .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);}
+  .user-mini{display:flex;align-items:center;gap:10px;}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--white);}
+  .user-mini-info{flex:1;min-width:0;}
+  .user-mini-info .name{font-size:.82rem;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-mini-info .email{font-size:.72rem;color:var(--gray400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* ── MAIN CONTENT ── */
+  .main-content{margin-left:240px;flex:1;display:flex;flex-direction:column;}
+  .topbar{background:var(--white);border-bottom:1px solid var(--gray200);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .topbar-title{font-size:1.1rem;font-weight:700;color:var(--navy);}
+  .topbar-right{display:flex;align-items:center;gap:16px;}
+  .notif-btn{position:relative;background:none;border:none;cursor:pointer;color:var(--gray600);font-size:1.1rem;padding:4px;}
+  .notif-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--red);border-radius:50%;}
+  .content-area{padding:28px 32px;flex:1;}
+
+  /* ── SECTIONS ── */
+  .section{display:none;}
+  .section.active{display:block;}
+
+  /* ── DASHBOARD CARDS ── */
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin-bottom:28px;}
+  .stat-card{background:var(--white);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:16px;}
+  .stat-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .stat-info strong{display:block;font-size:1.6rem;font-weight:900;color:var(--navy);}
+  .stat-info span{font-size:.8rem;color:var(--gray600);}
+  .stat-info .change{font-size:.75rem;color:var(--green);margin-top:2px;}
+
+  .dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+  @media(max-width:900px){.dashboard-grid{grid-template-columns:1fr;}.sidebar{width:60px;}.main-content{margin-left:60px;}.nav-item span,.sidebar-logo .logo-text,.sidebar-footer .user-mini-info,.sidebar-logo .role-badge,.nav-section-label{display:none;}}
+  .card{background:var(--white);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);}
+  .card-title{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th{text-align:left;padding:10px 12px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray600);border-bottom:2px solid var(--gray200);}
+  td{padding:12px 12px;border-bottom:1px solid var(--gray200);color:var(--navy3);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:var(--gray100);}
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:700;}
+  .badge-green{background:#dcfce7;color:#16a34a;}
+  .badge-gold{background:#fef3c7;color:#d97706;}
+  .badge-red{background:#fee2e2;color:#dc2626;}
+  .badge-blue{background:#dbeafe;color:#2563eb;}
+  .badge-purple{background:#ede9fe;color:#7c3aed;}
+
+  /* ── FORM CARD ── */
+  .form-card{background:var(--white);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:24px;}
+  .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+  .section-header h2{font-size:1.15rem;font-weight:800;color:var(--navy);}
+  .select-control{width:100%;padding:11px 14px;border:1.5px solid var(--gray200);border-radius:8px;font-size:.9rem;color:var(--text);outline:none;background:var(--white);cursor:pointer;}
+  .select-control:focus{border-color:var(--teal);}
+  textarea.form-control{resize:vertical;min-height:90px;}
+
+  /* ── TEMPLATE GRID ── */
+  .template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
+  .template-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;border:3px solid transparent;transition:all .2s;background:var(--white);}
+  .template-card.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),var(--shadow);}
+  .template-preview{height:160px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--gray400);position:relative;overflow:hidden;}
+  .template-info{padding:12px 14px;}
+  .template-info h4{font-size:.88rem;font-weight:700;color:var(--navy);}
+  .template-info p{font-size:.77rem;color:var(--gray600);}
+  .template-sel-badge{position:absolute;top:8px;right:8px;background:var(--gold);color:var(--navy);border-radius:100px;padding:2px 10px;font-size:.7rem;font-weight:700;display:none;}
+  .template-card.selected .template-sel-badge{display:block;}
+
+  /* ── CERTIFICATE CANVAS ── */
+  .cert-preview-wrap{background:var(--gray200);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:20px;}
+  canvas#certCanvas{max-width:100%;border-radius:8px;box-shadow:var(--shadow-lg);}
+  .cert-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+
+  /* ── PARTICIPANTS TABLE ── */
+  .search-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .search-input-wrap{flex:1;min-width:200px;position:relative;}
+  .search-input-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--gray400);}
+  .search-input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--gray200);border-radius:8px;font-size:.875rem;outline:none;}
+  .search-input:focus{border-color:var(--teal);}
+
+  /* ── MODALS ── */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{background:var(--white);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+  .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--gray200);display:flex;align-items:center;justify-content:space-between;}
+  .modal-header h3{font-size:1.05rem;font-weight:800;color:var(--navy);}
+  .modal-close{background:none;border:none;font-size:1.2rem;color:var(--gray400);cursor:pointer;padding:4px;}
+  .modal-close:hover{color:var(--navy);}
+  .modal-body{padding:24px;}
+  .modal-footer{padding:16px 24px;border-top:1px solid var(--gray200);display:flex;gap:12px;justify-content:flex-end;}
+
+  /* ── QR CODE ── */
+  #qrCanvas canvas{margin:0 auto;display:block;}
+  .qr-info{text-align:center;margin-top:12px;font-size:.8rem;color:var(--gray600);}
+
+  /* ── CHART BARS (CSS) ── */
+  .bar-chart{display:flex;gap:8px;align-items:flex-end;height:120px;padding:8px 0;}
+  .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .bar{width:100%;background:linear-gradient(180deg,var(--teal),var(--teal-dark));border-radius:4px 4px 0 0;transition:height .5s;min-height:4px;}
+  .bar-label{font-size:.65rem;color:var(--gray600);text-align:center;}
+  .bar-value{font-size:.65rem;font-weight:700;color:var(--navy);}
+
+  /* ── ACTIVITY FEED ── */
+  .activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray200);}
+  .activity-item:last-child{border-bottom:none;}
+  .activity-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+  .activity-text{font-size:.83rem;color:var(--navy3);line-height:1.4;}
+  .activity-time{font-size:.72rem;color:var(--gray400);}
+
+  /* ── VERIFICATION ── */
+  .verify-box{background:var(--white);border-radius:var(--radius);padding:32px;max-width:500px;margin:0 auto;box-shadow:var(--shadow);text-align:center;}
+  .verify-result{margin-top:24px;text-align:left;}
+  .verify-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray200);font-size:.88rem;}
+  .verify-item:last-child{border-bottom:none;}
+  .verify-item .label{color:var(--gray600);}
+  .verify-item .value{font-weight:600;color:var(--navy);}
+  .verify-icon-big{font-size:3rem;margin-bottom:12px;}
+
+  /* ── REPORTS ── */
+  .report-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:28px;}
+  .report-card{background:var(--white);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);cursor:pointer;transition:all .2s;border:2px solid transparent;}
+  .report-card:hover{border-color:var(--teal);transform:translateY(-2px);}
+  .report-card i{font-size:2rem;margin-bottom:12px;display:block;}
+  .report-card h4{font-size:.95rem;font-weight:700;color:var(--navy);}
+  .report-card p{font-size:.8rem;color:var(--gray600);margin-top:4px;}
+
+  /* ── PROFILE ── */
+  .profile-header{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:var(--radius);padding:32px;color:var(--white);margin-bottom:24px;display:flex;align-items:center;gap:24px;}
+  .profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--purple));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;color:var(--white);border:3px solid rgba(255,255,255,.2);}
+  .profile-info h2{font-size:1.3rem;font-weight:800;}
+  .profile-info p{color:var(--gray400);font-size:.9rem;}
+  .dark-mode-toggle{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;cursor:pointer;border:1px solid var(--gray200);background:var(--white);}
+  .toggle-switch{width:40px;height:22px;background:var(--gray200);border-radius:100px;position:relative;transition:background .2s;}
+  .toggle-switch.on{background:var(--teal);}
+  .toggle-knob{position:absolute;width:16px;height:16px;background:var(--white);border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+  .toggle-switch.on .toggle-knob{left:21px;}
+
+  /* ── DARK MODE ── */
+  body.dark{background:#0d1117;color:#e6edf3;}
+  body.dark .card,body.dark .form-card,body.dark .auth-box,body.dark .topbar,body.dark table,body.dark .modal,body.dark .verify-box,body.dark .dark-mode-toggle{background:#161b22;border-color:#30363d;}
+  body.dark th,body.dark td{border-color:#30363d;}
+  body.dark tr:hover td{background:#21262d;}
+  body.dark .form-control,body.dark .select-control,body.dark .search-input{background:#0d1117;border-color:#30363d;color:#e6edf3;}
+  body.dark .main-content{background:#0d1117;}
+  body.dark .stat-info strong,body.dark .card-title,body.dark .section-header h2,body.dark .topbar-title{color:#e6edf3;}
+  body.dark .cert-preview-wrap{background:#21262d;}
+  body.dark .template-card{background:#161b22;}
+
+  /* ── TOAST ── */
+  #toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+  .toast{background:var(--navy);color:var(--white);padding:12px 20px;border-radius:10px;font-size:.85rem;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;max-width:300px;}
+  .toast.success{background:#16a34a;}
+  .toast.error{background:#dc2626;}
+  .toast.info{background:var(--teal-dark);}
+  @keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+  /* ── UPLOAD AREA ── */
+  .upload-area{border:2px dashed var(--gray400);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray100);}
+  .upload-area:hover,.upload-area.drag{border-color:var(--teal);background:rgba(14,165,233,.04);}
+  .upload-area i{font-size:2.5rem;color:var(--gray400);margin-bottom:12px;display:block;}
+  .upload-area p{color:var(--gray600);font-size:.9rem;}
+  .upload-area strong{color:var(--teal);}
+  input[type=file]{display:none;}
+
+  /* ── PROGRESS ── */
+  .progress-bar{background:var(--gray200);border-radius:100px;height:8px;overflow:hidden;margin-top:8px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--purple));border-radius:100px;transition:width .4s;}
+
+  /* ── PAGINATION ── */
+  .pagination{display:flex;gap:6px;justify-content:flex-end;margin-top:16px;align-items:center;}
+  .page-btn{width:32px;height:32px;border-radius:6px;border:1.5px solid var(--gray200);background:var(--white);cursor:pointer;font-size:.8rem;font-weight:600;color:var(--navy3);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .page-btn.active,.page-btn:hover{background:var(--teal);border-color:var(--teal);color:var(--white);}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:600px){
+    .hero{padding:60px 20px 50px;}
+    .land-nav{padding:16px 20px;}
+    .land-nav-links{display:none;}
+    .content-area{padding:16px;}
+    .form-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: LANDING
+════════════════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+  <nav class="land-nav">
+    <div class="land-logo">Certify<span>Pro</span></div>
+    <ul class="land-nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#stats">Stats</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="land-nav-btns">
+      <button class="btn btn-outline" onclick="showPage('login')">Login</button>
+      <button class="btn btn-gold" onclick="showPage('register')">Get Started</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-eyebrow">🏆 Award-Winning Certificate System</div>
+    <h1>Generate <em>Professional</em> Certificates in Seconds</h1>
+    <p>Automate certificate creation for students, employees, and event participants. Bulk generate, verify via QR, and deliver by email — all from one dashboard.</p>
+    <div class="hero-btns">
+      <button class="btn btn-gold btn-lg" onclick="showPage('register')"><i class="fas fa-rocket"></i> Start for Free</button>
+      <button class="btn btn-outline btn-lg" onclick="demoLogin()"><i class="fas fa-play"></i> Live Demo</button>
+    </div>
+  </section>
+
+  <div class="stats-strip" id="stats">
+    <div class="stat-item"><strong>50K+</strong><span>Certificates Generated</span></div>
+    <div class="stat-item"><strong>200+</strong><span>Organizations</span></div>
+    <div class="stat-item"><strong>15+</strong><span>Templates</span></div>
+    <div class="stat-item"><strong>99.9%</strong><span>Uptime</span></div>
+  </div>
+
+  <section class="features-section" id="features">
+    <div class="section-title">
+      <h2>Everything You Need</h2>
+      <p>A complete certificate management platform, no design skills required.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(14,165,233,.15);color:var(--teal);"><i class="fas fa-certificate"></i></div>
+        <h3>Smart Certificate Generation</h3>
+        <p>Automatically place names, dates, and events on any template. One click per person or bulk generate hundreds at once.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(245,158,11,.15);color:var(--gold);"><i class="fas fa-qrcode"></i></div>
+        <h3>QR Code Verification</h3>
+        <p>Every certificate gets a unique QR code. Recipients and employers can instantly verify authenticity online.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(16,185,129,.15);color:var(--green);"><i class="fas fa-file-excel"></i></div>
+        <h3>Bulk Excel/CSV Import</h3>
+        <p>Upload your participant list as Excel or CSV and generate all certificates in a single operation with progress tracking.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(139,92,246,.15);color:var(--purple);"><i class="fas fa-envelope"></i></div>
+        <h3>Automated Email Delivery</h3>
+        <p>Send certificates directly to participants with customizable email templates and professional PDF attachments.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(239,68,68,.15);color:var(--red);"><i class="fas fa-chart-bar"></i></div>
+        <h3>Reports & Analytics</h3>
+        <p>Track certificate issuance by day, month, event, or department. Export full reports as Excel or PDF.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(14,165,233,.15);color:var(--teal);"><i class="fas fa-palette"></i></div>
+        <h3>Multiple Templates</h3>
+        <p>Choose from professional built-in templates or upload your own. Preview instantly before generating.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--navy2);padding:60px 48px;text-align:center;" id="contact">
+    <h2 style="color:var(--white);font-size:1.8rem;font-weight:900;margin-bottom:12px;">Ready to Automate Your Certificates?</h2>
+    <p style="color:var(--gray400);margin-bottom:28px;">Join 200+ organizations already saving hours every month.</p>
+    <button class="btn btn-gold btn-lg" onclick="showPage('register')"><i class="fas fa-user-plus"></i> Create Free Account</button>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: LOGIN
+════════════════════════════════════════════════════ -->
+<div id="page-login" class="page">
+  <div style="background:linear-gradient(135deg,var(--navy) 0%,#1a2744 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <div class="logo-mark">Certify<em>Pro</em></div>
+        <p>Certificate Generation System</p>
+      </div>
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to your dashboard</p>
+      <div id="login-error" class="alert alert-error" style="display:none;"></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope"></i>
+          <input type="email" class="form-control input-icon" id="login-email" placeholder="admin@certifypro.com" value="admin@certifypro.com"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-control input-icon" id="login-password" placeholder="••••••••" value="admin123"/>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--gray600);cursor:pointer;">
+          <input type="checkbox" checked/> Remember me
+        </label>
+        <a href="#" style="font-size:.82rem;color:var(--teal);text-decoration:none;" onclick="toast('Password reset link sent to your email','info')">Forgot password?</a>
+      </div>
+      <button class="btn btn-gold w-full" style="justify-content:center;" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+      <div class="auth-footer mt-12">Don't have an account? <a href="#" onclick="showPage('register')">Create one</a></div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn btn-teal w-full" style="justify-content:center;" onclick="demoLogin()"><i class="fas fa-play"></i> Quick Demo (pre-filled)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: REGISTER
+════════════════════════════════════════════════════ -->
+<div id="page-register" class="page">
+  <div style="background:linear-gradient(135deg,var(--navy) 0%,#1a2744 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <div class="logo-mark">Certify<em>Pro</em></div>
+        <p>Create your free account</p>
+      </div>
+      <h2>Get started</h2>
+      <p class="sub">Set up your organization in 30 seconds</p>
+      <div id="reg-success" class="alert alert-success" style="display:none;"></div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <div class="input-wrap">
+          <i class="fas fa-user"></i>
+          <input type="text" class="form-control input-icon" id="reg-name" placeholder="Dr. Priya Sharma"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope"></i>
+          <input type="email" class="form-control input-icon" id="reg-email" placeholder="you@university.edu"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Organization</label>
+        <div class="input-wrap">
+          <i class="fas fa-building"></i>
+          <input type="text" class="form-control input-icon" id="reg-org" placeholder="IIT Bhubaneswar"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-control input-icon" id="reg-password" placeholder="Minimum 6 characters"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select class="select-control" id="reg-role">
+          <option value="admin">Administrator</option>
+          <option value="faculty">Faculty / Instructor</option>
+          <option value="hr">HR Manager</option>
+          <option value="coordinator">Event Coordinator</option>
+        </select>
+      </div>
+      <button class="btn btn-gold w-full mt-12" style="justify-content:center;" onclick="doRegister()"><i class="fas fa-user-plus"></i> Create Account</button>
+      <div class="auth-footer mt-12">Already have an account? <a href="#" onclick="showPage('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: APP
+════════════════════════════════════════════════════ -->
+<div id="page-app" class="page">
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">Certify<span>Pro</span></div>
+        <div class="role-badge" id="sb-role">Admin</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <div class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-home"></i><span>Dashboard</span></div>
+        <div class="nav-item" onclick="showSection('participants')"><i class="fas fa-users"></i><span>Participants</span></div>
+        <div class="nav-item" onclick="showSection('templates')"><i class="fas fa-palette"></i><span>Templates</span></div>
+        <div class="nav-section-label">Certificates</div>
+        <div class="nav-item" onclick="showSection('generate')"><i class="fas fa-magic"></i><span>Generate</span></div>
+        <div class="nav-item" onclick="showSection('certificates')"><i class="fas fa-certificate"></i><span>All Certificates</span></div>
+        <div class="nav-item" onclick="showSection('upload')"><i class="fas fa-upload"></i><span>Bulk Upload</span></div>
+        <div class="nav-section-label">Tools</div>
+        <div class="nav-item" onclick="showSection('verify')"><i class="fas fa-shield-check"></i><span>Verify</span></div>
+        <div class="nav-item" onclick="showSection('reports')"><i class="fas fa-chart-bar"></i><span>Reports</span></div>
+        <div class="nav-item" onclick="showSection('profile')"><i class="fas fa-user-circle"></i><span>Profile</span></div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-mini">
+          <div class="avatar" id="sb-avatar">A</div>
+          <div class="user-mini-info">
+            <div class="name" id="sb-name">Admin User</div>
+            <div class="email" id="sb-email">admin@certifypro.com</div>
+          </div>
+          <button style="background:none;border:none;color:var(--gray400);cursor:pointer;font-size:.9rem;" onclick="logout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-right">
+          <button class="notif-btn" onclick="toast('No new notifications','info')"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
+          <button class="btn btn-gold btn-sm" onclick="showSection('generate')"><i class="fas fa-plus"></i> New Certificate</button>
+        </div>
+      </div>
+
+      <div class="content-area">
+
+        <!-- ────────────────────────────
+             SECTION: DASHBOARD
+        ──────────────────────────── -->
+        <div id="sec-dashboard" class="section active">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon" style="background:rgba(14,165,233,.12);color:var(--teal);"><i class="fas fa-certificate"></i></div><div class="stat-info"><strong id="stat-total">0</strong><span>Total Certificates</span><div class="change">↑ 12% this month</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.12);color:var(--gold);"><i class="fas fa-palette"></i></div><div class="stat-info"><strong id="stat-templates">3</strong><span>Templates</span><div class="change">Active</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><i class="fas fa-users"></i></div><div class="stat-info"><strong id="stat-participants">0</strong><span>Participants</span><div class="change">↑ 5 this week</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,.12);color:var(--purple);"><i class="fas fa-download"></i></div><div class="stat-info"><strong id="stat-downloads">0</strong><span>Downloads</span><div class="change">All time</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,.12);color:var(--red);"><i class="fas fa-envelope"></i></div><div class="stat-info"><strong id="stat-emails">0</strong><span>Emails Sent</span><div class="change">This month</div></div></div>
+          </div>
+          <div class="dashboard-grid">
+            <div class="card">
+              <div class="card-title">Monthly Certificates <select class="select-control" style="width:auto;padding:4px 10px;font-size:.75rem;" onchange="updateChart(this.value)"><option value="2025">2025</option><option value="2024">2024</option></select></div>
+              <div class="bar-chart" id="dash-chart"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Recent Activity</div>
+              <div id="activity-feed"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:24px;">
+            <div class="card-title">Recent Certificates</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Cert No.</th><th>Name</th><th>Event</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="dash-certs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: PARTICIPANTS
+        ──────────────────────────── -->
+        <div id="sec-participants" class="section">
+          <div class="section-header">
+            <h2>Participant Management</h2>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-teal btn-sm" onclick="exportParticipantsCSV()"><i class="fas fa-download"></i> Export CSV</button>
+              <button class="btn btn-gold btn-sm" onclick="openModal('modal-add-participant')"><i class="fas fa-plus"></i> Add Participant</button>
+            </div>
+          </div>
+          <div class="search-bar">
+            <div class="search-input-wrap"><i class="fas fa-search"></i><input type="text" class="search-input" id="participant-search" placeholder="Search by name, email, event…" oninput="renderParticipants()"/></div>
+            <select class="select-control" style="width:auto;min-width:140px;" id="participant-filter" onchange="renderParticipants()">
+              <option value="">All Events</option>
+            </select>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Course</th><th>Event</th><th>Cert No.</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody id="participants-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="p-pagination"></div>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: TEMPLATES
+        ──────────────────────────── -->
+        <div id="sec-templates" class="section">
+          <div class="section-header">
+            <h2>Certificate Templates</h2>
+            <button class="btn btn-gold btn-sm" onclick="openModal('modal-upload-template')"><i class="fas fa-upload"></i> Upload Template</button>
+          </div>
+          <div class="template-grid" id="template-grid"></div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: GENERATE
+        ──────────────────────────── -->
+        <div id="sec-generate" class="section">
+          <div class="section-header"><h2>Generate Certificate</h2></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div>
+              <div class="form-card">
+                <div class="card-title" style="margin-bottom:16px;">Participant Details</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" class="form-control" id="gen-name" placeholder="Ravi Kumar Mishra" oninput="livePreview()"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Course / Program *</label>
+                    <input type="text" class="form-control" id="gen-course" placeholder="B.Tech CSE" oninput="livePreview()"/>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Event / Workshop *</label>
+                    <input type="text" class="form-control" id="gen-event" placeholder="National Hackathon 2025" oninput="livePreview()"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Institution / College</label>
+                    <input type="text" class="form-control" id="gen-college" placeholder="ITER, Bhubaneswar" oninput="livePreview()"/>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" class="form-control" id="gen-dept" placeholder="Computer Science" oninput="livePreview()"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Grade / Achievement</label>
+                    <select class="select-control" id="gen-grade" onchange="livePreview()">
+                      <option value="">— Select —</option>
+                      <option>Distinction</option><option>First Class</option><option>Merit</option>
+                      <option>Pass</option><option>Gold Medal</option><option>Certificate of Excellence</option>
+                      <option>Participation</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Issue Date</label>
+                    <input type="date" class="form-control" id="gen-date" oninput="livePreview()"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Email (for sending)</label>
+                    <input type="email" class="form-control" id="gen-email" placeholder="ravi@example.com"/>
+                  </div>
+                </div>
+              </div>
+              <div class="form-card">
+                <div class="card-title" style="margin-bottom:16px;">Select Template</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="gen-template-picker"></div>
+              </div>
+              <div class="form-card">
+                <div class="card-title" style="margin-bottom:16px;">Signatory</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Authorized By</label>
+                    <input type="text" class="form-control" id="gen-signatory" placeholder="Prof. Suresh Panda" oninput="livePreview()"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Designation</label>
+                    <input type="text" class="form-control" id="gen-designation" placeholder="Director, Training & Placement" oninput="livePreview()"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="form-card">
+                <div class="card-title" style="margin-bottom:16px;"><i class="fas fa-eye" style="color:var(--teal);"></i> Live Preview</div>
+                <div class="cert-preview-wrap">
+                  <canvas id="certCanvas" width="900" height="630"></canvas>
+                </div>
+                <div class="cert-actions" style="margin-top:16px;">
+                  <button class="btn btn-gold" onclick="generateAndSave()"><i class="fas fa-magic"></i> Generate & Save</button>
+                  <button class="btn btn-teal" onclick="downloadCert()"><i class="fas fa-download"></i> Download PDF</button>
+                  <button class="btn btn-green" onclick="sendEmailSim()"><i class="fas fa-envelope"></i> Send Email</button>
+                  <button class="btn btn-outline" style="border-color:var(--gray400);color:var(--navy3);" onclick="printCert()"><i class="fas fa-print"></i> Print</button>
+                </div>
+              </div>
+              <div class="form-card">
+                <div class="card-title" style="margin-bottom:12px;"><i class="fas fa-qrcode" style="color:var(--gold);"></i> QR Code Preview</div>
+                <div id="qrCanvas" style="display:flex;justify-content:center;"></div>
+                <div class="qr-info" id="qr-cert-no"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: ALL CERTIFICATES
+        ──────────────────────────── -->
+        <div id="sec-certificates" class="section">
+          <div class="section-header">
+            <h2>All Certificates</h2>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-teal btn-sm" onclick="exportCertsCSV()"><i class="fas fa-download"></i> Export</button>
+              <button class="btn btn-gold btn-sm" onclick="showSection('generate')"><i class="fas fa-plus"></i> Generate New</button>
+            </div>
+          </div>
+          <div class="search-bar">
+            <div class="search-input-wrap"><i class="fas fa-search"></i><input type="text" class="search-input" id="cert-search" placeholder="Search certificates…" oninput="renderCertificates()"/></div>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Cert No.</th><th>Participant</th><th>Event</th><th>Template</th><th>Issue Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="certificates-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="c-pagination"></div>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: BULK UPLOAD
+        ──────────────────────────── -->
+        <div id="sec-upload" class="section">
+          <div class="section-header"><h2>Bulk Upload</h2></div>
+          <div class="form-card">
+            <div class="card-title" style="margin-bottom:16px;">Upload Participant File</div>
+            <label class="upload-area" for="excel-file" id="upload-area" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p><strong>Click to upload</strong> or drag & drop</p>
+              <p style="margin-top:6px;font-size:.8rem;">Supports .xlsx, .csv — Max 10MB</p>
+            </label>
+            <input type="file" id="excel-file" accept=".xlsx,.csv" onchange="handleFileUpload(this)"/>
+          </div>
+          <div class="form-card" id="bulk-preview-card" style="display:none;">
+            <div class="card-title" style="margin-bottom:16px;"><i class="fas fa-table" style="color:var(--teal);"></i> File Preview</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Course</th><th>Event</th><th>Date</th></tr></thead>
+                <tbody id="bulk-tbody"></tbody>
+              </table>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <div style="flex:1;">
+                <div style="font-size:.85rem;font-weight:600;color:var(--navy3);margin-bottom:6px;" id="bulk-status">Ready to generate 0 certificates</div>
+                <div class="progress-bar"><div class="progress-fill" id="bulk-progress" style="width:0%"></div></div>
+              </div>
+              <div style="display:flex;gap:10px;flex-shrink:0;">
+                <select class="select-control" style="width:auto;" id="bulk-template-select">
+                  <option value="0">Template 1 — Classic Gold</option>
+                  <option value="1">Template 2 — Modern Blue</option>
+                  <option value="2">Template 3 — Elegant Dark</option>
+                </select>
+                <button class="btn btn-gold" onclick="bulkGenerate()"><i class="fas fa-magic"></i> Generate All</button>
+                <button class="btn btn-teal" onclick="bulkDownloadZip()"><i class="fas fa-file-archive"></i> Download ZIP</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="card-title" style="margin-bottom:12px;">CSV Format Guide</div>
+            <p style="font-size:.85rem;color:var(--gray600);margin-bottom:12px;">Your CSV/Excel file should have these columns in the first row:</p>
+            <div style="background:var(--gray100);border-radius:8px;padding:12px;font-family:monospace;font-size:.8rem;color:var(--navy3);">
+              name, email, course, event, date, college, department, grade
+            </div>
+            <button class="btn btn-outline btn-sm" style="margin-top:12px;border-color:var(--gray400);color:var(--navy3);" onclick="downloadSampleCSV()"><i class="fas fa-download"></i> Download Sample CSV</button>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: VERIFY
+        ──────────────────────────── -->
+        <div id="sec-verify" class="section">
+          <div class="section-header"><h2>Certificate Verification</h2></div>
+          <div class="verify-box">
+            <div class="verify-icon-big">🛡️</div>
+            <h3 style="font-size:1.2rem;font-weight:800;color:var(--navy);margin-bottom:6px;">Verify a Certificate</h3>
+            <p style="font-size:.88rem;color:var(--gray600);margin-bottom:24px;">Enter the certificate number to check its authenticity</p>
+            <div style="display:flex;gap:10px;">
+              <input type="text" class="form-control" id="verify-input" placeholder="e.g. CERT-2025-001" style="flex:1;"/>
+              <button class="btn btn-gold" onclick="verifyCertificate()"><i class="fas fa-search"></i> Verify</button>
+            </div>
+            <div id="verify-result" class="verify-result" style="display:none;"></div>
+          </div>
+          <div style="margin-top:24px;" class="card">
+            <div class="card-title">Recently Verified</div>
+            <div id="verify-history" style="font-size:.85rem;color:var(--gray600);text-align:center;padding:20px;">No verifications yet.</div>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: REPORTS
+        ──────────────────────────── -->
+        <div id="sec-reports" class="section">
+          <div class="section-header"><h2>Reports & Analytics</h2></div>
+          <div class="report-cards">
+            <div class="report-card" onclick="generateReport('daily')"><i class="fas fa-calendar-day" style="color:var(--teal);"></i><h4>Daily Report</h4><p>Today's certificate activity</p></div>
+            <div class="report-card" onclick="generateReport('monthly')"><i class="fas fa-calendar-alt" style="color:var(--gold);"></i><h4>Monthly Report</h4><p>Certificate trends this month</p></div>
+            <div class="report-card" onclick="generateReport('event')"><i class="fas fa-star" style="color:var(--purple);"></i><h4>Event Report</h4><p>Certificates by event breakdown</p></div>
+            <div class="report-card" onclick="generateReport('user')"><i class="fas fa-users" style="color:var(--green);"></i><h4>User Report</h4><p>All registered participant data</p></div>
+          </div>
+          <div class="card" id="report-output">
+            <div class="card-title">Report Output <span id="report-title-span" style="font-weight:400;color:var(--gray600);font-size:.85rem;"></span></div>
+            <div id="report-content" style="font-size:.85rem;color:var(--gray600);padding:20px;text-align:center;">Click a report above to generate it.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;">
+            <div class="card">
+              <div class="card-title">Certificates by Event</div>
+              <div id="events-chart" class="bar-chart"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Certificates by Month</div>
+              <div id="months-chart" class="bar-chart"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ────────────────────────────
+             SECTION: PROFILE
+        ──────────────────────────── -->
+        <div id="sec-profile" class="section">
+          <div class="section-header"><h2>Profile & Settings</h2></div>
+          <div class="profile-header">
+            <div class="profile-avatar" id="profile-avatar-big">A</div>
+            <div class="profile-info">
+              <h2 id="profile-name-big">Admin User</h2>
+              <p id="profile-role-big">Administrator — CertifyPro</p>
+              <p id="profile-email-big" style="color:var(--gray400);font-size:.85rem;">admin@certifypro.com</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div class="form-card">
+              <div class="card-title" style="margin-bottom:16px;">Edit Profile</div>
+              <div class="form-group"><label>Full Name</label><input type="text" class="form-control" id="prof-name" placeholder="Your name"/></div>
+              <div class="form-group"><label>Email</label><input type="email" class="form-control" id="prof-email" placeholder="you@example.com"/></div>
+              <div class="form-group"><label>Organization</label><input type="text" class="form-control" id="prof-org" placeholder="Organization name"/></div>
+              <div class="form-group"><label>New Password</label><input type="password" class="form-control" id="prof-pass" placeholder="Leave blank to keep current"/></div>
+              <button class="btn btn-gold" onclick="saveProfile()"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+            <div class="form-card">
+              <div class="card-title" style="margin-bottom:16px;">Preferences</div>
+              <div style="margin-bottom:16px;">
+                <p style="font-size:.85rem;font-weight:600;color:var(--navy3);margin-bottom:8px;">Dark Mode</p>
+                <div class="dark-mode-toggle" onclick="toggleDark()">
+                  <div class="toggle-switch" id="dark-toggle"><div class="toggle-knob"></div></div>
+                  <span style="font-size:.85rem;color:var(--gray600);">Enable dark mode</span>
+                </div>
+              </div>
+              <div style="margin-bottom:16px;">
+                <p style="font-size:.85rem;font-weight:600;color:var(--navy3);margin-bottom:8px;">Default Template</p>
+                <select class="select-control" id="pref-template">
+                  <option>Classic Gold</option><option>Modern Blue</option><option>Elegant Dark</option>
+                </select>
+              </div>
+              <div>
+                <p style="font-size:.85rem;font-weight:600;color:var(--navy3);margin-bottom:8px;">Email Signature</p>
+                <textarea class="form-control" rows="3" placeholder="Warm regards,&#10;The CertifyPro Team"></textarea>
+              </div>
+              <div style="margin-top:20px;padding:16px;background:var(--gold-light);border-radius:8px;font-size:.82rem;">
+                <strong>Account Statistics</strong><br/>
+                Member since: <span id="prof-member-since">—</span><br/>
+                Certificates generated: <span id="prof-cert-count">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end content-area -->
+    </div><!-- end main-content -->
+  </div><!-- end app-shell -->
+</div><!-- end page-app -->
+
+<!-- ══════════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════════ -->
+
+<!-- Add Participant -->
+<div class="modal-overlay" id="modal-add-participant" style="display:none;">
+  <div class="modal">
+    <div class="modal-header"><h3 id="add-p-title">Add Participant</h3><button class="modal-close" onclick="closeModal('modal-add-participant')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-p-id"/>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" class="form-control" id="p-name" placeholder="Ravi Kumar"/></div>
+        <div class="form-group"><label>Email *</label><input type="email" class="form-control" id="p-email" placeholder="ravi@example.com"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Course</label><input type="text" class="form-control" id="p-course" placeholder="B.Tech CSE"/></div>
+        <div class="form-group"><label>Event</label><input type="text" class="form-control" id="p-event" placeholder="Hackathon 2025"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>College</label><input type="text" class="form-control" id="p-college" placeholder="ITER"/></div>
+        <div class="form-group"><label>Department</label><input type="text" class="form-control" id="p-dept" placeholder="CSE"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Grade</label><select class="select-control" id="p-grade"><option>—</option><option>Distinction</option><option>First Class</option><option>Merit</option><option>Pass</option><option>Gold Medal</option><option>Participation</option></select></div>
+        <div class="form-group"><label>Issue Date</label><input type="date" class="form-control" id="p-date"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="border-color:var(--gray400);color:var(--navy3);" onclick="closeModal('modal-add-participant')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveParticipant()"><i class="fas fa-save"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Template -->
+<div class="modal-overlay" id="modal-upload-template" style="display:none;">
+  <div class="modal">
+    <div class="modal-header"><h3>Upload Template</h3><button class="modal-close" onclick="closeModal('modal-upload-template')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Template Name</label><input type="text" class="form-control" id="tmpl-name" placeholder="My Custom Template"/></div>
+      <div class="form-group"><label>Style</label>
+        <select class="select-control" id="tmpl-style">
+          <option value="gold">Classic Gold</option><option value="blue">Modern Blue</option><option value="dark">Elegant Dark</option>
+          <option value="green">Nature Green</option><option value="purple">Royal Purple</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Upload Image (optional)</label>
+        <label class="upload-area" style="padding:20px;" for="tmpl-file">
+          <i class="fas fa-image" style="font-size:1.5rem;"></i>
+          <p><strong>Click to upload</strong> PNG/JPG</p>
+        </label>
+        <input type="file" id="tmpl-file" accept="image/*" onchange="previewTemplateFile(this)"/>
+      </div>
+      <div id="tmpl-img-preview" style="display:none;text-align:center;margin-top:8px;"><img id="tmpl-img" style="max-height:120px;border-radius:8px;"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="border-color:var(--gray400);color:var(--navy3);" onclick="closeModal('modal-upload-template')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveTemplate()"><i class="fas fa-save"></i> Add Template</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Certificate -->
+<div class="modal-overlay" id="modal-view-cert" style="display:none;">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header"><h3 id="view-cert-title">Certificate Preview</h3><button class="modal-close" onclick="closeModal('modal-view-cert')"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="cert-preview-wrap"><canvas id="certCanvasModal" width="900" height="630" style="max-width:100%;border-radius:8px;"></canvas></div>
+      <div id="qrCanvasModal" style="display:flex;justify-content:center;margin-top:16px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-teal" onclick="downloadCertModal()"><i class="fas fa-download"></i> Download PDF</button>
+      <button class="btn btn-green" onclick="sendEmailModal()"><i class="fas fa-envelope"></i> Send Email</button>
+      <button class="btn btn-gold" onclick="closeModal('modal-view-cert')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────────
+let appState = {
+  user: null,
+  participants: [],
+  certificates: [],
+  templates: [
+    {id:0,name:'Classic Gold',style:'gold',custom:false},
+    {id:1,name:'Modern Blue',style:'blue',custom:false},
+    {id:2,name:'Elegant Dark',style:'dark',custom:false},
+  ],
+  selectedTemplate: 0,
+  currentCert: null,
+  darkMode: false,
+  downloads: 0,
+  emails: 0,
+  verifyHistory: [],
+  certCounter: 0,
+};
+
+const USERS_KEY = 'certpro_users';
+const STATE_KEY = 'certpro_state';
+
+function loadState(){
+  try{
+    const s = localStorage.getItem(STATE_KEY);
+    if(s){const parsed=JSON.parse(s);Object.assign(appState,parsed);appState.user=null;}
+  }catch(e){}
+}
+function saveState(){
+  const toSave = {...appState,user:null};
+  localStorage.setItem(STATE_KEY,JSON.stringify(toSave));
+}
+function getUsers(){try{return JSON.parse(localStorage.getItem(USERS_KEY)||'[]');}catch{return[];}}
+function saveUsers(u){localStorage.setItem(USERS_KEY,JSON.stringify(u));}
+
+// ──────────────────────────────────────────────────
+// PAGE NAVIGATION
+// ──────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+}
+
+function demoLogin(){
+  document.getElementById('login-email').value='admin@certifypro.com';
+  document.getElementById('login-password').value='admin123';
+  showPage('login');
+  toast('Demo credentials pre-filled. Click Sign In!','info');
+}
+
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  errEl.style.display='none';
+  // Default demo account
+  if(email==='admin@certifypro.com'&&pass==='admin123'){
+    appState.user={name:'Admin User',email,role:'admin',org:'CertifyPro Demo',memberSince:new Date().toLocaleDateString()};
+    enterApp();return;
+  }
+  const users=getUsers();
+  const u=users.find(x=>x.email===email&&x.password===pass);
+  if(u){appState.user=u;enterApp();}
+  else{errEl.textContent='Invalid email or password.';errEl.style.display='block';}
+}
+
+function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const org=document.getElementById('reg-org').value.trim();
+  const pass=document.getElementById('reg-password').value;
+  const role=document.getElementById('reg-role').value;
+  const suc=document.getElementById('reg-success');
+  if(!name||!email||!pass){toast('Please fill in required fields','error');return;}
+  if(pass.length<6){toast('Password must be at least 6 characters','error');return;}
+  const users=getUsers();
+  if(users.find(u=>u.email===email)){toast('Email already registered','error');return;}
+  const newUser={name,email,org,password:pass,role,memberSince:new Date().toLocaleDateString()};
+  users.push(newUser);saveUsers(users);
+  suc.textContent='Account created! Redirecting to login…';suc.style.display='block';
+  setTimeout(()=>{showPage('login');suc.style.display='none';},1800);
+}
+
+function enterApp(){
+  loadState();
+  showPage('app');
+  initApp();
+  showSection('dashboard');
+  toast('Welcome back, '+appState.user.name.split(' ')[0]+'! 👋','success');
+}
+
+function logout(){
+  saveState();
+  appState.user=null;
+  showPage('landing');
+  toast('You have been signed out.','info');
+}
+
+// ──────────────────────────────────────────────────
+// SECTION NAVIGATION
+// ──────────────────────────────────────────────────
+const sectionTitles={dashboard:'Dashboard',participants:'Participants',templates:'Templates',generate:'Generate Certificate',certificates:'All Certificates',upload:'Bulk Upload',verify:'Verify Certificate',reports:'Reports',profile:'Profile & Settings'};
+
+function showSection(s){
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('sec-'+s).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const navEls=document.querySelectorAll('.nav-item');
+  navEls.forEach(el=>{if(el.getAttribute('onclick')&&el.getAttribute('onclick').includes("'"+s+"'"))el.classList.add('active');});
+  document.getElementById('topbar-title').textContent=sectionTitles[s]||s;
+  if(s==='dashboard')refreshDashboard();
+  if(s==='participants')renderParticipants();
+  if(s==='templates')renderTemplates();
+  if(s==='certificates')renderCertificates();
+  if(s==='generate'){initGenerate();}
+  if(s==='reports')initReports();
+  if(s==='profile')initProfile();
+}
+
+// ──────────────────────────────────────────────────
+// INIT APP
+// ──────────────────────────────────────────────────
+function initApp(){
+  // Sidebar info
+  const u=appState.user;
+  document.getElementById('sb-name').textContent=u.name;
+  document.getElementById('sb-email').textContent=u.email;
+  document.getElementById('sb-avatar').textContent=u.name[0].toUpperCase();
+  document.getElementById('sb-role').textContent=u.role||'Admin';
+  // Seed demo data if empty
+  if(appState.participants.length===0) seedDemoData();
+  if(appState.darkMode) document.body.classList.add('dark');
+  // Set today's date in generate form
+  document.getElementById('gen-date').value=todayStr();
+}
+
+function todayStr(){return new Date().toISOString().split('T')[0];}
+
+function seedDemoData(){
+  const events=['National Hackathon 2025','Web Development Bootcamp','AI/ML Workshop','Cloud Computing Summit','Cybersecurity Symposium'];
+  const courses=['B.Tech CSE','M.Tech IT','BCA','MCA','B.Tech ECE','MBA Tech'];
+  const names=['Ravi Kumar Mishra','Priya Sharma','Anjali Patel','Suresh Nayak','Deepika Rao','Arjun Verma','Sunita Das','Vikram Singh','Pooja Joshi','Kiran Malhotra','Amit Ghosh','Sneha Reddy'];
+  appState.certCounter = 0;
+  names.forEach((name,i)=>{
+    const pid=i+1;
+    const date=new Date(2025,Math.floor(Math.random()*6),Math.floor(Math.random()*28)+1);
+    const p={id:pid,name,email:name.split(' ')[0].toLowerCase()+'@example.com',course:courses[i%courses.length],event:events[i%events.length],college:'ITER College of Technology',department:'Computer Science',grade:['Distinction','First Class','Merit','Participation'][i%4],date:date.toISOString().split('T')[0],certNo:genCertNo()};
+    appState.participants.push(p);
+    if(i<8){
+      const cert={id:i+1,participantId:pid,name,event:p.event,course:p.course,template:appState.templates[i%3].name,templateStyle:appState.templates[i%3].style,date:p.date,certNo:p.certNo,college:p.college,dept:p.department,grade:p.grade,signatory:'Prof. Suresh Panda',designation:'Director, T&P',email:p.email};
+      appState.certificates.push(cert);
+    }
+  });
+  appState.downloads=14;appState.emails=6;
+  saveState();
+}
+
+function genCertNo(){
+  appState.certCounter=(appState.certCounter||0)+1;
+  return 'CERT-'+(new Date().getFullYear())+'-'+String(appState.certCounter).padStart(3,'0');
+}
+
+// ──────────────────────────────────────────────────
+// DASHBOARD
+// ──────────────────────────────────────────────────
+function refreshDashboard(){
+  document.getElementById('stat-total').textContent=appState.certificates.length;
+  document.getElementById('stat-participants').textContent=appState.participants.length;
+  document.getElementById('stat-templates').textContent=appState.templates.length;
+  document.getElementById('stat-downloads').textContent=appState.downloads;
+  document.getElementById('stat-emails').textContent=appState.emails;
+  drawBarChart('dash-chart',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],[3,5,8,4,12,7,9,6,11,8,5,appState.certificates.length%15+2]);
+  renderActivityFeed();
+  renderDashCerts();
+}
+
+function updateChart(year){
+  const base=year==='2024'?[2,4,6,3,8,5,7,4,9,6,4,7]:[3,5,8,4,12,7,9,6,11,8,5,appState.certificates.length%15+2];
+  drawBarChart('dash-chart',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],base);
+}
+
+function drawBarChart(id,labels,values){
+  const container=document.getElementById(id);
+  if(!container)return;
+  const max=Math.max(...values,1);
+  container.innerHTML=values.map((v,i)=>`
+    <div class="bar-wrap">
+      <span class="bar-value">${v}</span>
+      <div class="bar" style="height:${Math.max(4,(v/max)*90)}px;background:linear-gradient(180deg,var(--teal),var(--teal-dark));"></div>
+      <span class="bar-label">${labels[i]}</span>
+    </div>`).join('');
+}
+
+function renderActivityFeed(){
+  const activities=[
+    {text:'Certificate generated for <strong>Ravi Kumar</strong>',time:'2 min ago',color:'var(--green)'},
+    {text:'Template "Modern Blue" uploaded',time:'15 min ago',color:'var(--teal)'},
+    {text:'Bulk upload: 12 certificates generated',time:'1 hr ago',color:'var(--gold)'},
+    {text:'Email sent to priya@example.com',time:'3 hrs ago',color:'var(--purple)'},
+    {text:'New participant added: Anjali Patel',time:'5 hrs ago',color:'var(--teal)'},
+  ];
+  document.getElementById('activity-feed').innerHTML=activities.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.color};"></div>
+      <div><div class="activity-text">${a.text}</div><div class="activity-time">${a.time}</div></div>
+    </div>`).join('');
+}
+
+function renderDashCerts(){
+  const recent=appState.certificates.slice(-5).reverse();
+  document.getElementById('dash-certs-tbody').innerHTML=recent.map(c=>`
+    <tr>
+      <td><code style="font-size:.78rem;">${c.certNo}</code></td>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.event}</td>
+      <td>${c.date}</td>
+      <td><span class="badge badge-green">Issued</span></td>
+      <td><button class="btn btn-teal btn-sm" onclick="viewCertificate(${c.id})"><i class="fas fa-eye"></i></button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray400);">No certificates yet</td></tr>';
+}
+
+// ──────────────────────────────────────────────────
+// PARTICIPANTS
+// ──────────────────────────────────────────────────
+let pPage=1; const PER_PAGE=8;
+
+function renderParticipants(){
+  const q=(document.getElementById('participant-search').value||'').toLowerCase();
+  const ev=document.getElementById('participant-filter').value;
+  let list=appState.participants.filter(p=>{
+    const match=!q||(p.name+p.email+p.event+p.course).toLowerCase().includes(q);
+    const evMatch=!ev||p.event===ev;
+    return match&&evMatch;
+  });
+  // Update filter
+  const events=[...new Set(appState.participants.map(p=>p.event))];
+  const filterEl=document.getElementById('participant-filter');
+  const curVal=filterEl.value;
+  filterEl.innerHTML='<option value="">All Events</option>'+events.map(e=>`<option ${e===curVal?'selected':''}>${e}</option>`).join('');
+  filterEl.value=curVal;
+
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/PER_PAGE));
+  if(pPage>pages)pPage=1;
+  const slice=list.slice((pPage-1)*PER_PAGE,pPage*PER_PAGE);
+  document.getElementById('participants-tbody').innerHTML=slice.map((p,i)=>`
+    <tr>
+      <td>${(pPage-1)*PER_PAGE+i+1}</td>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.email}</td>
+      <td>${p.course}</td>
+      <td>${p.event}</td>
+      <td><code style="font-size:.75rem;">${p.certNo||'—'}</code></td>
+      <td>${p.date}</td>
+      <td>
+        <button class="btn btn-teal btn-sm" onclick="generateForParticipant(${p.id})" title="Generate Certificate"><i class="fas fa-magic"></i></button>
+        <button class="btn btn-gold btn-sm" onclick="editParticipant(${p.id})" title="Edit"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteParticipant(${p.id})" title="Delete"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray400);">No participants found</td></tr>';
+  renderPagination('p-pagination',pages,pPage,n=>{pPage=n;renderParticipants();});
+}
+
+function renderPagination(id,pages,current,cb){
+  const el=document.getElementById(id);
+  if(pages<=1){el.innerHTML='';return;}
+  let html='';
+  for(let i=1;i<=pages;i++) html+=`<button class="page-btn ${i===current?'active':''}" onclick="(${cb.toString()})(${i})">${i}</button>`;
+  el.innerHTML=html;
+}
+
+function openModal(id){document.getElementById(id).style.display='flex';}
+function closeModal(id){document.getElementById(id).style.display='none';}
+
+function saveParticipant(){
+  const id=document.getElementById('edit-p-id').value;
+  const p={
+    name:document.getElementById('p-name').value.trim(),
+    email:document.getElementById('p-email').value.trim(),
+    course:document.getElementById('p-course').value.trim(),
+    event:document.getElementById('p-event').value.trim(),
+    college:document.getElementById('p-college').value.trim(),
+    department:document.getElementById('p-dept').value.trim(),
+    grade:document.getElementById('p-grade').value,
+    date:document.getElementById('p-date').value||todayStr(),
+  };
+  if(!p.name||!p.email){toast('Name and email are required','error');return;}
+  if(id){
+    const idx=appState.participants.findIndex(x=>x.id==id);
+    if(idx>-1){appState.participants[idx]={...appState.participants[idx],...p};toast('Participant updated','success');}
+  } else {
+    p.id=Date.now();p.certNo=genCertNo();
+    appState.participants.push(p);toast('Participant added','success');
+  }
+  saveState();closeModal('modal-add-participant');renderParticipants();refreshDashboard();
+}
+
+function editParticipant(id){
+  const p=appState.participants.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('edit-p-id').value=p.id;
+  document.getElementById('add-p-title').textContent='Edit Participant';
+  ['name','email','course','event','college','dept','grade','date'].forEach(f=>{
+    const el=document.getElementById('p-'+f);
+    if(el)el.value=p[f]||p[f==='dept'?'department':f]||'';
+  });
+  document.getElementById('p-dept').value=p.department||'';
+  document.getElementById('p-date').value=p.date||todayStr();
+  openModal('modal-add-participant');
+}
+
+function deleteParticipant(id){
+  if(!confirm('Delete this participant?'))return;
+  appState.participants=appState.participants.filter(p=>p.id!==id);
+  saveState();renderParticipants();toast('Participant deleted','info');
+}
+
+function generateForParticipant(id){
+  const p=appState.participants.find(x=>x.id===id);
+  if(!p)return;
+  showSection('generate');
+  document.getElementById('gen-name').value=p.name;
+  document.getElementById('gen-course').value=p.course;
+  document.getElementById('gen-event').value=p.event;
+  document.getElementById('gen-college').value=p.college||'';
+  document.getElementById('gen-dept').value=p.department||'';
+  document.getElementById('gen-grade').value=p.grade||'';
+  document.getElementById('gen-date').value=p.date||todayStr();
+  document.getElementById('gen-email').value=p.email||'';
+  livePreview();
+}
+
+function exportParticipantsCSV(){
+  const rows=[['Name','Email','Course','Event','College','Department','Grade','Date','Certificate No.']];
+  appState.participants.forEach(p=>rows.push([p.name,p.email,p.course,p.event,p.college||'',p.department||'',p.grade||'',p.date,p.certNo||'']));
+  downloadCSV(rows,'participants.csv');
+  toast('Participants exported as CSV','success');
+}
+
+function downloadCSV(rows,filename){
+  const csv=rows.map(r=>r.map(v=>`"${v||''}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+}
+
+// ──────────────────────────────────────────────────
+// TEMPLATES
+// ──────────────────────────────────────────────────
+const TEMPLATE_STYLES={
+  gold:{bg:'#fffdf0',border:'#c9a227',title:'#8b6914',text:'#4a3d0f',accent:'#c9a227',label:'Classic Gold'},
+  blue:{bg:'#f0f7ff',border:'#1a56db',title:'#1e3a8a',text:'#1e3a5f',accent:'#2563eb',label:'Modern Blue'},
+  dark:{bg:'#1a1a2e',border:'#7c3aed',title:'#a78bfa',text:'#e2d9f3',accent:'#7c3aed',label:'Elegant Dark'},
+  green:{bg:'#f0fdf4',border:'#16a34a',title:'#14532d',text:'#1c4226',accent:'#16a34a',label:'Nature Green'},
+  purple:{bg:'#fdf4ff',border:'#9333ea',title:'#581c87',text:'#3b0764',accent:'#9333ea',label:'Royal Purple'},
+};
+
+function renderTemplates(){
+  const grid=document.getElementById('template-grid');
+  grid.innerHTML=appState.templates.map((t,i)=>{
+    const s=TEMPLATE_STYLES[t.style]||TEMPLATE_STYLES.gold;
+    return `<div class="template-card ${appState.selectedTemplate===i?'selected':''}" onclick="selectTemplate(${i})">
+      <div class="template-preview" style="background:${s.bg};border-bottom:3px solid ${s.border};">
+        <div class="template-sel-badge">✓ Selected</div>
+        <div style="text-align:center;padding:12px;">
+          <div style="font-size:.65rem;font-weight:700;color:${s.title};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Certificate of Achievement</div>
+          <div style="font-size:.55rem;color:${s.text};margin-bottom:6px;">This is to certify that</div>
+          <div style="font-size:.9rem;font-weight:800;color:${s.title};font-family:serif;">John Doe</div>
+          <div style="width:40px;height:1px;background:${s.accent};margin:4px auto;"></div>
+          <div style="font-size:.55rem;color:${s.text};">has successfully completed</div>
+          <div style="width:24px;height:24px;margin:6px auto;border:2px solid ${s.border};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:${s.accent};">QR</div>
+        </div>
+      </div>
+      <div class="template-info">
+        <h4>${t.name}</h4>
+        <p style="display:flex;align-items:center;justify-content:space-between;">
+          <span>${s.label||t.style}</span>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteTemplate(${i})" style="padding:3px 8px;">✕</button>
+        </p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectTemplate(i){
+  appState.selectedTemplate=i;
+  renderTemplates();
+  livePreview();
+  toast('Template selected: '+appState.templates[i].name,'success');
+}
+
+function saveTemplate(){
+  const name=document.getElementById('tmpl-name').value.trim()||'Custom Template';
+  const style=document.getElementById('tmpl-style').value;
+  appState.templates.push({id:appState.templates.length,name,style,custom:true});
+  saveState();closeModal('modal-upload-template');renderTemplates();
+  toast('Template "'+name+'" added','success');
+  document.getElementById('tmpl-name').value='';
+}
+
+function deleteTemplate(i){
+  if(appState.templates.length<=1){toast('Keep at least one template','error');return;}
+  if(!confirm('Delete this template?'))return;
+  appState.templates.splice(i,1);
+  if(appState.selectedTemplate>=appState.templates.length)appState.selectedTemplate=0;
+  saveState();renderTemplates();toast('Template deleted','info');
+}
+
+function previewTemplateFile(input){
+  const f=input.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{document.getElementById('tmpl-img').src=e.target.result;document.getElementById('tmpl-img-preview').style.display='block';};
+  r.readAsDataURL(f);
+}
+
+// ──────────────────────────────────────────────────
+// CERTIFICATE GENERATION (Canvas)
+// ──────────────────────────────────────────────────
+let qrInstance=null;
+let currentCertData=null;
+
+function initGenerate(){
+  renderGenTemplatePicker();
+  livePreview();
+}
+
+function renderGenTemplatePicker(){
+  const el=document.getElementById('gen-template-picker');
+  el.innerHTML=appState.templates.map((t,i)=>{
+    const s=TEMPLATE_STYLES[t.style]||TEMPLATE_STYLES.gold;
+    return `<div onclick="selectTemplateInGen(${i})" style="border:2px solid ${appState.selectedTemplate===i?s.border:'var(--gray200)'};border-radius:8px;padding:8px;cursor:pointer;background:${s.bg};text-align:center;transition:all .2s;">
+      <div style="font-size:.65rem;font-weight:700;color:${s.title};margin-bottom:2px;">${t.name}</div>
+      <div style="width:30px;height:2px;background:${s.border};margin:0 auto;border-radius:2px;"></div>
+      ${appState.selectedTemplate===i?'<div style="font-size:.6rem;margin-top:3px;color:'+s.accent+';">✓ Selected</div>':''}
+    </div>`;
+  }).join('');
+}
+
+function selectTemplateInGen(i){appState.selectedTemplate=i;renderGenTemplatePicker();livePreview();}
+
+function livePreview(){
+  const data=collectGenData();
+  currentCertData=data;
+  drawCertificate('certCanvas',data);
+  generateQR(data.certNo);
+  document.getElementById('qr-cert-no').textContent='Certificate: '+data.certNo;
+}
+
+function collectGenData(){
+  return {
+    name:document.getElementById('gen-name').value||'Participant Name',
+    course:document.getElementById('gen-course').value||'Course Name',
+    event:document.getElementById('gen-event').value||'Event Name',
+    college:document.getElementById('gen-college').value||'Institution',
+    dept:document.getElementById('gen-dept').value||'',
+    grade:document.getElementById('gen-grade').value||'',
+    date:document.getElementById('gen-date').value||todayStr(),
+    email:document.getElementById('gen-email').value||'',
+    signatory:document.getElementById('gen-signatory').value||'Authorized Signatory',
+    designation:document.getElementById('gen-designation').value||'Director',
+    certNo:currentCertData?currentCertData.certNo:genCertNo(),
+    template:appState.templates[appState.selectedTemplate],
+    templateStyle:appState.templates[appState.selectedTemplate].style,
+  };
+}
+
+function drawCertificate(canvasId,data){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=900,H=630;
+  const s=TEMPLATE_STYLES[data.templateStyle]||TEMPLATE_STYLES.gold;
+
+  ctx.clearRect(0,0,W,H);
+  // Background
+  ctx.fillStyle=s.bg;ctx.fillRect(0,0,W,H);
+  // Outer border
+  ctx.strokeStyle=s.border;ctx.lineWidth=8;ctx.strokeRect(12,12,W-24,H-24);
+  // Inner border
+  ctx.strokeStyle=s.border;ctx.lineWidth=2;ctx.globalAlpha=0.5;ctx.strokeRect(22,22,W-44,H-44);ctx.globalAlpha=1;
+
+  // Corner ornaments
+  drawCorner(ctx,30,30,s.accent,1,1);drawCorner(ctx,W-30,30,s.accent,-1,1);
+  drawCorner(ctx,30,H-30,s.accent,1,-1);drawCorner(ctx,W-30,H-30,s.accent,-1,-1);
+
+  // Header band
+  ctx.fillStyle=s.border;ctx.globalAlpha=0.08;ctx.fillRect(0,0,W,90);ctx.globalAlpha=1;
+
+  // Logo circle
+  ctx.beginPath();ctx.arc(W/2,58,28,0,Math.PI*2);ctx.fillStyle=s.border;ctx.globalAlpha=0.15;ctx.fill();ctx.globalAlpha=1;
+  ctx.beginPath();ctx.arc(W/2,58,24,0,Math.PI*2);ctx.strokeStyle=s.border;ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=s.title;ctx.font='bold 14px serif';ctx.textAlign='center';ctx.fillText('🏆',W/2,63);
+
+  // Title
+  ctx.fillStyle=s.title;ctx.font='bold 18px "Segoe UI",sans-serif';ctx.textAlign='center';ctx.letterSpacing='3px';
+  ctx.fillText('CERTIFICATE OF ACHIEVEMENT',W/2,105);
+
+  // Divider
+  drawDivider(ctx,W/2,120,300,s.accent);
+
+  // Issued to
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.7;ctx.font='13px "Segoe UI",sans-serif';ctx.textAlign='center';
+  ctx.fillText('THIS IS TO CERTIFY THAT',W/2,155);ctx.globalAlpha=1;
+
+  // Name
+  ctx.fillStyle=s.title;ctx.font='bold 42px Georgia,serif';ctx.textAlign='center';
+  ctx.fillText(data.name,W/2,210);
+
+  // Underline
+  const nw=ctx.measureText(data.name).width;
+  ctx.strokeStyle=s.accent;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(W/2-nw/2,218);ctx.lineTo(W/2+nw/2,218);ctx.stroke();
+
+  // Has completed text
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.75;ctx.font='13px "Segoe UI",sans-serif';ctx.textAlign='center';
+  ctx.fillText('has successfully completed',W/2,248);ctx.globalAlpha=1;
+
+  // Event
+  ctx.fillStyle=s.title;ctx.font='bold 22px "Segoe UI",sans-serif';ctx.textAlign='center';
+  ctx.fillText(data.event,W/2,282);
+
+  // Course / College
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.8;ctx.font='13px "Segoe UI",sans-serif';ctx.textAlign='center';
+  let line2=data.course+(data.college&&data.college!=='Institution'?' · '+data.college:'');
+  ctx.fillText(line2,W/2,308);ctx.globalAlpha=1;
+
+  // Grade badge
+  if(data.grade&&data.grade!=='— Select —'){
+    ctx.fillStyle=s.accent;ctx.globalAlpha=0.15;roundRect(ctx,W/2-70,322,140,28,14);ctx.fill();ctx.globalAlpha=1;
+    ctx.strokeStyle=s.accent;ctx.lineWidth=1;roundRect(ctx,W/2-70,322,140,28,14);ctx.stroke();
+    ctx.fillStyle=s.title;ctx.font='bold 12px "Segoe UI",sans-serif';ctx.textAlign='center';
+    ctx.fillText(data.grade.toUpperCase(),W/2,340);
+  }
+
+  // Divider 2
+  drawDivider(ctx,W/2,368,200,s.accent);
+
+  // Date & Cert No row
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.7;ctx.font='11px "Segoe UI",sans-serif';
+  ctx.textAlign='left';ctx.fillText('Date of Issue',100,392);
+  ctx.textAlign='center';ctx.fillText('Certificate No.',W/2,392);
+  ctx.textAlign='right';ctx.fillText('Authorized By',W-100,392);ctx.globalAlpha=1;
+
+  ctx.fillStyle=s.title;ctx.font='bold 13px "Segoe UI",sans-serif';
+  ctx.textAlign='left';ctx.fillText(formatDate(data.date),100,412);
+  ctx.textAlign='center';ctx.fillText(data.certNo,W/2,412);
+  ctx.textAlign='right';ctx.fillText(data.signatory,W-100,412);
+
+  // Signatory designation
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.6;ctx.font='10px "Segoe UI",sans-serif';
+  ctx.textAlign='right';ctx.fillText(data.designation,W-100,428);ctx.globalAlpha=1;
+
+  // Signature line
+  ctx.strokeStyle=s.accent;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W-220,440);ctx.lineTo(W-80,440);ctx.stroke();
+
+  // QR code placeholder (bottom left)
+  ctx.fillStyle=s.border;ctx.globalAlpha=0.12;ctx.fillRect(70,460,70,70);ctx.globalAlpha=1;
+  ctx.strokeStyle=s.border;ctx.lineWidth=1;ctx.strokeRect(70,460,70,70);
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.5;ctx.font='bold 8px monospace';ctx.textAlign='center';
+  ctx.fillText('QR CODE',105,498);ctx.fillText('SCAN TO',105,510);ctx.fillText('VERIFY',105,522);ctx.globalAlpha=1;
+
+  // Bottom footer
+  ctx.fillStyle=s.border;ctx.globalAlpha=0.06;ctx.fillRect(0,H-50,W,50);ctx.globalAlpha=1;
+  ctx.fillStyle=s.text;ctx.globalAlpha=0.5;ctx.font='10px "Segoe UI",sans-serif';ctx.textAlign='center';
+  ctx.fillText('Generated by CertifyPro • Verify at certifypro.app/verify/'+data.certNo,W/2,H-22);ctx.globalAlpha=1;
+
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+function drawCorner(ctx,x,y,color,sx,sy){
+  ctx.strokeStyle=color;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(x,y+sy*20);ctx.lineTo(x,y);ctx.lineTo(x+sx*20,y);ctx.stroke();
+}
+
+function drawDivider(ctx,cx,y,hw,color){
+  ctx.strokeStyle=color;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cx-hw,y);ctx.lineTo(cx-20,y);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,y,6,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+20,y);ctx.lineTo(cx+hw,y);ctx.stroke();
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function formatDate(d){
+  if(!d)return '';
+  const dt=new Date(d);
+  return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+}
+
+function generateQR(certNo){
+  const el=document.getElementById('qrCanvas');
+  if(!el)return;
+  el.innerHTML='';
+  try{
+    new QRCode(el,{text:'https://certifypro.app/verify/'+certNo,width:100,height:100,colorDark:'#0f172a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+  }catch(e){el.innerHTML='<div style="width:100px;height:100px;background:var(--gray200);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--gray600);">QR Code</div>';}
+}
+
+function generateAndSave(){
+  const data=collectGenData();
+  currentCertData=data;
+  const cert={
+    id:Date.now(),
+    participantId:null,
+    name:data.name,
+    event:data.event,
+    course:data.course,
+    template:data.template.name,
+    templateStyle:data.templateStyle,
+    date:data.date,
+    certNo:data.certNo,
+    college:data.college,
+    dept:data.dept,
+    grade:data.grade,
+    signatory:data.signatory,
+    designation:data.designation,
+    email:data.email,
+  };
+  // Check if cert with same certNo exists
+  if(!appState.certificates.find(c=>c.certNo===data.certNo))
+    appState.certificates.push(cert);
+  saveState();
+  toast('Certificate generated and saved! 🎉','success');
+  refreshDashboard();
+}
+
+function downloadCert(){
+  const data=currentCertData||collectGenData();
+  generateAndSave();
+  const canvas=document.getElementById('certCanvas');
+  const imgData=canvas.toDataURL('image/jpeg',0.95);
+  try{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[900,630]});
+    pdf.addImage(imgData,'JPEG',0,0,900,630);
+    pdf.save(data.name.replace(/\s/g,'_')+'_Certificate.pdf');
+    appState.downloads++;saveState();
+    toast('Certificate downloaded as PDF!','success');
+  }catch(e){
+    const a=document.createElement('a');a.href=imgData;a.download=data.name.replace(/\s/g,'_')+'_Certificate.jpg';a.click();
+    appState.downloads++;saveState();
+    toast('Certificate downloaded as image!','success');
+  }
+}
+
+function printCert(){
+  const canvas=document.getElementById('certCanvas');
+  const w=window.open('','_blank');
+  w.document.write('<img src="'+canvas.toDataURL()+'" style="width:100%;"/><script>window.print();<\/script>');
+  w.document.close();
+}
+
+function sendEmailSim(){
+  const data=currentCertData||collectGenData();
+  generateAndSave();
+  appState.emails++;saveState();
+  toast('Certificate emailed to '+( data.email||'participant')+'! 📧','success');
+}
+
+// ──────────────────────────────────────────────────
+// ALL CERTIFICATES
+// ──────────────────────────────────────────────────
+let cPage=1;
+
+function renderCertificates(){
+  const q=(document.getElementById('cert-search').value||'').toLowerCase();
+  let list=appState.certificates.filter(c=>!q||(c.name+c.event+c.certNo+c.template).toLowerCase().includes(q));
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/PER_PAGE));
+  if(cPage>pages)cPage=1;
+  const slice=list.slice((cPage-1)*PER_PAGE,cPage*PER_PAGE);
+  document.getElementById('certificates-tbody').innerHTML=slice.map(c=>`
+    <tr>
+      <td><code style="font-size:.75rem;">${c.certNo}</code></td>
+      <td><strong>${c.name}</strong><br/><span style="font-size:.75rem;color:var(--gray600);">${c.email||''}</span></td>
+      <td>${c.event}</td>
+      <td><span class="badge badge-blue">${c.template}</span></td>
+      <td>${formatDate(c.date)}</td>
+      <td><span class="badge badge-green">Issued</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-teal btn-sm" onclick="viewCertificate(${c.id})" title="Preview"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-gold btn-sm" onclick="downloadCertById(${c.id})" title="Download"><i class="fas fa-download"></i></button>
+        <button class="btn btn-green btn-sm" onclick="emailCertById(${c.id})" title="Send Email"><i class="fas fa-envelope"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCert(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray400);">No certificates found</td></tr>';
+  renderPagination('c-pagination',pages,cPage,n=>{cPage=n;renderCertificates();});
+}
+
+function viewCertificate(id){
+  const c=appState.certificates.find(x=>x.id===id);
+  if(!c)return;
+  document.getElementById('view-cert-title').textContent='Certificate — '+c.name;
+  openModal('modal-view-cert');
+  setTimeout(()=>{
+    drawCertificate('certCanvasModal',{...c,templateStyle:c.templateStyle||'gold',template:appState.templates.find(t=>t.name===c.template)||appState.templates[0]});
+    const qrEl=document.getElementById('qrCanvasModal');
+    qrEl.innerHTML='';
+    try{new QRCode(qrEl,{text:'https://certifypro.app/verify/'+c.certNo,width:80,height:80,colorDark:'#0f172a',colorLight:'#ffffff'});}catch(e){}
+    window._viewingCert=c;
+  },100);
+}
+
+function downloadCertModal(){
+  const c=window._viewingCert;if(!c)return;
+  const canvas=document.getElementById('certCanvasModal');
+  const imgData=canvas.toDataURL('image/jpeg',0.95);
+  try{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[900,630]});
+    pdf.addImage(imgData,'JPEG',0,0,900,630);
+    pdf.save(c.name.replace(/\s/g,'_')+'_Certificate.pdf');
+    appState.downloads++;saveState();
+    toast('PDF Downloaded!','success');
+  }catch(e){const a=document.createElement('a');a.href=imgData;a.download=c.name+'_cert.jpg';a.click();}
+}
+
+function sendEmailModal(){
+  const c=window._viewingCert;if(!c)return;
+  appState.emails++;saveState();
+  toast('Email sent to '+c.email,'success');
+}
+
+function downloadCertById(id){
+  const c=appState.certificates.find(x=>x.id===id);if(!c)return;
+  const canvas=document.createElement('canvas');canvas.width=900;canvas.height=630;
+  drawCertificate(null,{...c,templateStyle:c.templateStyle||'gold'});
+  // We draw on a temp canvas
+  const tmp=document.createElement('canvas');tmp.width=900;tmp.height=630;
+  document.body.appendChild(tmp);tmp.style.display='none';
+  const oldId=tmp.id;tmp.id='__tmpCanvas';
+  drawCertificate('__tmpCanvas',{...c,templateStyle:c.templateStyle||'gold'});
+  const imgData=tmp.toDataURL('image/jpeg',0.95);
+  document.body.removeChild(tmp);
+  try{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[900,630]});
+    pdf.addImage(imgData,'JPEG',0,0,900,630);
+    pdf.save(c.name.replace(/\s/g,'_')+'_Certificate.pdf');
+    appState.downloads++;saveState();
+    toast('PDF Downloaded!','success');
+  }catch(e){const a=document.createElement('a');a.href=imgData;a.download=c.name+'_cert.jpg';a.click();}
+}
+
+function emailCertById(id){
+  const c=appState.certificates.find(x=>x.id===id);if(!c)return;
+  appState.emails++;saveState();
+  toast('Certificate sent to '+c.email,'success');
+}
+
+function deleteCert(id){
+  if(!confirm('Delete this certificate?'))return;
+  appState.certificates=appState.certificates.filter(c=>c.id!==id);
+  saveState();renderCertificates();refreshDashboard();toast('Certificate deleted','info');
+}
+
+function exportCertsCSV(){
+  const rows=[['Cert No.','Name','Email','Event','Course','Template','Date','Grade']];
+  appState.certificates.forEach(c=>rows.push([c.certNo,c.name,c.email||'',c.event,c.course,c.template,c.date,c.grade||'']));
+  downloadCSV(rows,'certificates.csv');
+  toast('Certificates exported as CSV','success');
+}
+
+// ──────────────────────────────────────────────────
+// BULK UPLOAD
+// ──────────────────────────────────────────────────
+let bulkData=[];
+
+function handleFileUpload(input){
+  const f=input.files[0];if(!f)return;
+  simulateBulkParse(f.name);
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('upload-area').classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f)simulateBulkParse(f.name);
+}
+
+function simulateBulkParse(filename){
+  // Simulate parsing — generate sample rows from participants or demo
+  bulkData=appState.participants.slice(0,6).map(p=>({
+    name:p.name,email:p.email,course:p.course,event:p.event,
+    date:p.date,college:p.college||'Sample College',grade:p.grade||'Merit',
+  }));
+  if(bulkData.length===0){
+    bulkData=[
+      {name:'Sample Student 1',email:'s1@example.com',course:'B.Tech CSE',event:'Workshop 2025',date:todayStr(),college:'ITER'},
+      {name:'Sample Student 2',email:'s2@example.com',course:'MCA',event:'Workshop 2025',date:todayStr(),college:'ITER'},
+    ];
+  }
+  document.getElementById('bulk-tbody').innerHTML=bulkData.map((r,i)=>`
+    <tr><td>${i+1}</td><td>${r.name}</td><td>${r.email}</td><td>${r.course}</td><td>${r.event}</td><td>${r.date}</td></tr>`).join('');
+  document.getElementById('bulk-status').textContent=`Ready to generate ${bulkData.length} certificates from "${filename}"`;
+  document.getElementById('bulk-preview-card').style.display='block';
+  document.getElementById('bulk-progress').style.width='0%';
+  toast('File parsed: '+bulkData.length+' participants found','success');
+}
+
+function bulkGenerate(){
+  if(bulkData.length===0){toast('No data to generate','error');return;}
+  const tIdx=parseInt(document.getElementById('bulk-template-select').value)||0;
+  let i=0;
+  const statusEl=document.getElementById('bulk-status');
+  const progEl=document.getElementById('bulk-progress');
+  function step(){
+    if(i>=bulkData.length){toast('All '+bulkData.length+' certificates generated! 🎉','success');saveState();refreshDashboard();return;}
+    const r=bulkData[i];
+    const cn=genCertNo();
+    appState.certificates.push({
+      id:Date.now()+i,participantId:null,name:r.name,email:r.email,course:r.course,
+      event:r.event,date:r.date,certNo:cn,college:r.college||'',grade:r.grade||'Merit',
+      template:appState.templates[tIdx]?.name||'Classic Gold',
+      templateStyle:appState.templates[tIdx]?.style||'gold',
+      signatory:'Prof. Admin',designation:'Director',
+    });
+    i++;
+    const pct=Math.round((i/bulkData.length)*100);
+    progEl.style.width=pct+'%';
+    statusEl.textContent=`Generating ${i}/${bulkData.length} certificates…`;
+    setTimeout(step,120);
+  }
+  step();
+}
+
+function bulkDownloadZip(){
+  toast('ZIP download requires backend; certificates generated & saved in system','info');
+  appState.downloads+=bulkData.length;saveState();
+}
+
+function downloadSampleCSV(){
+  const rows=[
+    ['name','email','course','event','date','college','department','grade'],
+    ['Ravi Kumar','ravi@example.com','B.Tech CSE','Hackathon 2025','2025-06-15','ITER Bhubaneswar','CSE','Distinction'],
+    ['Priya Sharma','priya@example.com','MCA','AI Workshop','2025-06-20','SOA University','IT','First Class'],
+  ];
+  downloadCSV(rows,'sample_participants.csv');
+  toast('Sample CSV downloaded','success');
+}
+
+// ──────────────────────────────────────────────────
+// VERIFY
+// ──────────────────────────────────────────────────
+function verifyCertificate(){
+  const no=document.getElementById('verify-input').value.trim();
+  const resultEl=document.getElementById('verify-result');
+  if(!no){toast('Enter a certificate number','error');return;}
+  const c=appState.certificates.find(x=>x.certNo===no||x.certNo.toUpperCase()===no.toUpperCase());
+  if(c){
+    resultEl.style.display='block';
+    resultEl.innerHTML=`
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:3rem;">✅</div>
+        <div style="font-weight:800;color:var(--green);font-size:1.1rem;">Certificate Verified</div>
+      </div>
+      ${[['Certificate No.',c.certNo],['Participant Name',c.name],['Course / Program',c.course],['Event',c.event],['Institution',c.college||'—'],['Grade',c.grade||'—'],['Issue Date',formatDate(c.date)],['Template',c.template],['Status','✓ VALID — Issued by CertifyPro']].map(([l,v])=>`
+      <div class="verify-item"><span class="label">${l}</span><span class="value">${v}</span></div>`).join('')}`;
+    // Add to history
+    appState.verifyHistory.unshift({certNo:no,name:c.name,time:new Date().toLocaleTimeString(),found:true});
+    toast('Certificate verified ✓','success');
+  } else {
+    resultEl.style.display='block';
+    resultEl.innerHTML=`<div style="text-align:center;padding:20px;"><div style="font-size:3rem;">❌</div><div style="font-weight:800;color:var(--red);font-size:1.1rem;margin-bottom:8px;">Certificate Not Found</div><div style="font-size:.88rem;color:var(--gray600);">No certificate found for number <strong>${no}</strong>. Please check and try again.</div></div>`;
+    appState.verifyHistory.unshift({certNo:no,name:'Unknown',time:new Date().toLocaleTimeString(),found:false});
+    toast('Certificate not found','error');
+  }
+  renderVerifyHistory();
+}
+
+function renderVerifyHistory(){
+  const el=document.getElementById('verify-history');
+  if(appState.verifyHistory.length===0){el.innerHTML='<p style="text-align:center;color:var(--gray400);">No verifications yet.</p>';return;}
+  el.innerHTML=`<table style="width:100%;font-size:.83rem;"><thead><tr><th>Cert No.</th><th>Name</th><th>Time</th><th>Result</th></tr></thead><tbody>
+  ${appState.verifyHistory.slice(0,5).map(v=>`<tr><td><code>${v.certNo}</code></td><td>${v.name}</td><td>${v.time}</td><td><span class="badge ${v.found?'badge-green':'badge-red'}">${v.found?'Valid':'Not Found'}</span></td></tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ──────────────────────────────────────────────────
+// REPORTS
+// ──────────────────────────────────────────────────
+function initReports(){
+  // Events chart
+  const events={};
+  appState.certificates.forEach(c=>{events[c.event]=(events[c.event]||0)+1;});
+  const eKeys=Object.keys(events).slice(0,6);
+  const eVals=eKeys.map(k=>events[k]);
+  drawBarChart('events-chart',eKeys.map(k=>k.length>10?k.substr(0,10)+'…':k),eVals);
+  // Monthly
+  const months=Array(12).fill(0);
+  appState.certificates.forEach(c=>{if(c.date){const m=new Date(c.date).getMonth();months[m]++;}});
+  drawBarChart('months-chart',['J','F','M','A','M','J','J','A','S','O','N','D'],months);
+}
+
+function generateReport(type){
+  const titleMap={daily:'Daily Report — Today',monthly:'Monthly Report — This Month',event:'Event-wise Report',user:'User/Participant Report'};
+  document.getElementById('report-title-span').textContent='— '+titleMap[type];
+  let html='';
+  if(type==='daily'){
+    const today=todayStr();
+    const todayCerts=appState.certificates.filter(c=>c.date===today);
+    html=`<div style="margin-bottom:12px;font-weight:600;">Today: ${today}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+      <div style="background:var(--gray100);border-radius:8px;padding:16px;text-align:center;"><strong style="font-size:1.5rem;">${todayCerts.length}</strong><br/><span style="font-size:.8rem;color:var(--gray600);">Certs Generated</span></div>
+      <div style="background:var(--gray100);border-radius:8px;padding:16px;text-align:center;"><strong style="font-size:1.5rem;">${appState.participants.length}</strong><br/><span style="font-size:.8rem;color:var(--gray600);">Total Participants</span></div>
+      <div style="background:var(--gray100);border-radius:8px;padding:16px;text-align:center;"><strong style="font-size:1.5rem;">${appState.downloads}</strong><br/><span style="font-size:.8rem;color:var(--gray600);">Downloads</span></div>
+    </div>
+    ${todayCerts.length?'<table><thead><tr><th>Cert No.</th><th>Name</th><th>Event</th></tr></thead><tbody>'+todayCerts.map(c=>`<tr><td><code>${c.certNo}</code></td><td>${c.name}</td><td>${c.event}</td></tr>`).join('')+'</tbody></table>':'<p style="color:var(--gray400);">No certificates generated today.</p>'}`;
+  } else if(type==='monthly'){
+    const m=new Date().getMonth();
+    const mCerts=appState.certificates.filter(c=>c.date&&new Date(c.date).getMonth()===m);
+    html=`<div style="font-weight:600;margin-bottom:12px;">Month: ${new Date().toLocaleString('default',{month:'long',year:'numeric'})}</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+      <div style="background:var(--gray100);border-radius:8px;padding:16px;text-align:center;"><strong style="font-size:1.5rem;">${mCerts.length}</strong><br/><span style="font-size:.8rem;color:var(--gray600);">Certificates This Month</span></div>
+      <div style="background:var(--gray100);border-radius:8px;padding:16px;text-align:center;"><strong style="font-size:1.5rem;">${appState.emails}</strong><br/><span style="font-size:.8rem;color:var(--gray600);">Emails Sent</span></div>
+    </div>`;
+  } else if(type==='event'){
+    const events={};
+    appState.certificates.forEach(c=>{events[c.event]=(events[c.event]||0)+1;});
+    html=`<table><thead><tr><th>Event</th><th>Certificates</th><th>%</th></tr></thead><tbody>
+    ${Object.entries(events).map(([e,n])=>`<tr><td>${e}</td><td>${n}</td><td>${Math.round(n/appState.certificates.length*100)}%</td></tr>`).join('')}
+    </tbody></table>`;
+  } else if(type==='user'){
+    html=`<table><thead><tr><th>Name</th><th>Email</th><th>Cert No.</th><th>Event</th><th>Date</th></tr></thead><tbody>
+    ${appState.participants.map(p=>`<tr><td>${p.name}</td><td>${p.email}</td><td><code>${p.certNo||'—'}</code></td><td>${p.event}</td><td>${p.date}</td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  document.getElementById('report-content').innerHTML=html;
+  // Export buttons
+  document.getElementById('report-output').querySelector('.card-title').innerHTML=`
+    Report Output <span id="report-title-span" style="font-weight:400;color:var(--gray600);font-size:.85rem;">— ${titleMap[type]}</span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-teal btn-sm" onclick="exportReportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+      <button class="btn btn-gold btn-sm" onclick="toast('PDF report downloaded!','success')"><i class="fas fa-file-pdf"></i> Export PDF</button>
+    </div>`;
+}
+
+function exportReportCSV(){
+  const rows=[['Certificate No.','Name','Email','Event','Course','Date']];
+  appState.certificates.forEach(c=>rows.push([c.certNo,c.name,c.email||'',c.event,c.course,c.date]));
+  downloadCSV(rows,'report.csv');
+  toast('Report exported as CSV','success');
+}
+
+// ──────────────────────────────────────────────────
+// PROFILE
+// ──────────────────────────────────────────────────
+function initProfile(){
+  const u=appState.user;
+  if(!u)return;
+  document.getElementById('profile-avatar-big').textContent=u.name[0].toUpperCase();
+  document.getElementById('profile-name-big').textContent=u.name;
+  document.getElementById('profile-role-big').textContent=(u.role||'Admin')+' — '+(u.org||'CertifyPro');
+  document.getElementById('profile-email-big').textContent=u.email;
+  document.getElementById('prof-name').value=u.name;
+  document.getElementById('prof-email').value=u.email;
+  document.getElementById('prof-org').value=u.org||'';
+  document.getElementById('prof-member-since').textContent=u.memberSince||'—';
+  document.getElementById('prof-cert-count').textContent=appState.certificates.length;
+  const dt=document.getElementById('dark-toggle');
+  if(appState.darkMode)dt.classList.add('on');else dt.classList.remove('on');
+}
+
+function saveProfile(){
+  const u=appState.user;
+  u.name=document.getElementById('prof-name').value||u.name;
+  u.email=document.getElementById('prof-email').value||u.email;
+  u.org=document.getElementById('prof-org').value||u.org;
+  const newPass=document.getElementById('prof-pass').value;
+  if(newPass&&newPass.length>=6) u.password=newPass;
+  document.getElementById('sb-name').textContent=u.name;
+  document.getElementById('sb-email').textContent=u.email;
+  document.getElementById('sb-avatar').textContent=u.name[0].toUpperCase();
+  initProfile();
+  toast('Profile saved successfully','success');
+}
+
+function toggleDark(){
+  appState.darkMode=!appState.darkMode;
+  document.body.classList.toggle('dark',appState.darkMode);
+  const dt=document.getElementById('dark-toggle');
+  if(appState.darkMode)dt.classList.add('on');else dt.classList.remove('on');
+  saveState();
+}
+
+// ──────────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────────
+function toast(msg,type='info'){
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast '+(type==='success'?'success':type==='error'?'error':'info');
+  const icons={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
+  t.innerHTML=`<i class="fas ${icons[type]||'fa-info-circle'}"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(()=>t.remove(),400);},3000);
+}
+
+// ──────────────────────────────────────────────────
+// INIT ON LOAD
+// ──────────────────────────────────────────────────
+loadState();
+// If user was previously logged in (no - we don't persist session for security)
+// Show landing by default
+showPage('landing');
+
+// Keyboard shortcut: Enter on login
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const lp=document.getElementById('page-login');
+    if(lp.classList.contains('active'))doLogin();
+  }
+});
+</script>
+</body>
+</html>
